@@ -1,0 +1,503 @@
+{
+  "tiles": [
+    {
+      "id": 0,
+      "clk": 40000000,
+      "tdm": {
+        "period": 10000000,
+        "table": [
+          {
+            "id": 0,
+            "duration": 5000
+          },
+          {
+            "id": null,
+            "duration": 2000
+          },
+          {
+            "id": 1,
+            "duration": 58000
+          },
+          {
+            "id": null,
+            "duration": 2000
+          }
+        ],
+        "OS": {
+          "id": null,
+          "duration": 2000
+        }
+      },
+      "idMem": {
+        "size": 128,
+        "maxBlocks": 32,
+        "used": 128,
+        "allocBlocks": [
+          {
+            "base": 0,
+            "size": 32,
+            "id": 0,
+            "lock": true,
+            "data": ""
+          },
+          {
+            "base": 32768,
+            "size": 32,
+            "id": 1,
+            "lock": true,
+            "data": "vep_1/partition_0_1/out.hex"
+          },
+          {
+            "base": 65536,
+            "size": 64,
+            "id": 2,
+            "lock": true,
+            "data": "vep_1/partition_0_2/out.hex"
+          }
+        ]
+      },
+      "axiMMU": {
+        "tableSize": 16,
+        "table": [
+          {
+            "id": 1,
+            "ranges": [
+              {
+                "base": 150732800,
+                "anew": 150732800,
+                "mask": 4294901752,
+                "permflag": 7
+              },
+              {
+                "base": 2952790016,
+                "anew": 2952796160,
+                "mask": 4294966784,
+                "permflag": 7
+              },
+              {
+                "base": 2952792064,
+                "anew": 2952802304,
+                "mask": 4294965248,
+                "permflag": 7
+              },
+              {
+                "base": 2952826880,
+                "anew": 2952826880,
+                "mask": 4294963200,
+                "permflag": 7
+              },
+              {
+                "base": 2952830976,
+                "anew": 2952830976,
+                "mask": 4294959104,
+                "permflag": 7
+              },
+              {
+                "base": 2952839168,
+                "anew": 2952839168,
+                "mask": 4294950912,
+                "permflag": 7
+              },
+              {
+                "base": 2952855552,
+                "anew": 2952855552,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2147549184,
+                "anew": 2147549184,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2415984640,
+                "anew": 2415984640,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2684420096,
+                "anew": 2684420096,
+                "mask": 4294901760,
+                "permflag": 7
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "ranges": [
+              {
+                "base": 150732800,
+                "anew": 150732800,
+                "mask": 4294901752,
+                "permflag": 7
+              },
+              {
+                "base": 2952790016,
+                "anew": 2952796672,
+                "mask": 4294966784,
+                "permflag": 7
+              },
+              {
+                "base": 2952792064,
+                "anew": 2952804352,
+                "mask": 4294965248,
+                "permflag": 7
+              },
+              {
+                "base": 2952826880,
+                "anew": 2952826880,
+                "mask": 4294963200,
+                "permflag": 7
+              },
+              {
+                "base": 2952830976,
+                "anew": 2952830976,
+                "mask": 4294959104,
+                "permflag": 7
+              },
+              {
+                "base": 2952839168,
+                "anew": 2952839168,
+                "mask": 4294950912,
+                "permflag": 7
+              },
+              {
+                "base": 2952855552,
+                "anew": 2952855552,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2147549184,
+                "anew": 2147549184,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2415984640,
+                "anew": 2415984640,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2684420096,
+                "anew": 2684420096,
+                "mask": 4294901760,
+                "permflag": 7
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "clk": 40000000,
+      "tdm": {
+        "period": 10000000,
+        "table": [
+          {
+            "id": 0,
+            "duration": 5000
+          },
+          {
+            "id": null,
+            "duration": 2000
+          },
+          {
+            "id": 1,
+            "duration": 58000
+          },
+          {
+            "id": null,
+            "duration": 2000
+          }
+        ],
+        "OS": {
+          "id": null,
+          "duration": 2000
+        }
+      },
+      "idMem": {
+        "size": 128,
+        "maxBlocks": 32,
+        "used": 128,
+        "allocBlocks": [
+          {
+            "base": 0,
+            "size": 32,
+            "id": 0,
+            "lock": true,
+            "data": ""
+          },
+          {
+            "base": 32768,
+            "size": 32,
+            "id": 1,
+            "lock": true,
+            "data": "vep_1/partition_1_1/out.hex"
+          },
+          {
+            "base": 65536,
+            "size": 64,
+            "id": 2,
+            "lock": true,
+            "data": "vep_1/partition_1_2/out.hex"
+          }
+        ]
+      },
+      "axiMMU": {
+        "tableSize": 16,
+        "table": [
+          {
+            "id": 1,
+            "ranges": [
+              {
+                "base": 150732800,
+                "anew": 150732800,
+                "mask": 4294901752,
+                "permflag": 7
+              },
+              {
+                "base": 2952790016,
+                "anew": 2952798208,
+                "mask": 4294966784,
+                "permflag": 7
+              },
+              {
+                "base": 2952792064,
+                "anew": 2952810496,
+                "mask": 4294965248,
+                "permflag": 7
+              },
+              {
+                "base": 2952826880,
+                "anew": 2952826880,
+                "mask": 4294963200,
+                "permflag": 7
+              },
+              {
+                "base": 2952830976,
+                "anew": 2952830976,
+                "mask": 4294959104,
+                "permflag": 7
+              },
+              {
+                "base": 2952839168,
+                "anew": 2952839168,
+                "mask": 4294950912,
+                "permflag": 7
+              },
+              {
+                "base": 2952855552,
+                "anew": 2952855552,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2147549184,
+                "anew": 2147549184,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2415984640,
+                "anew": 2415984640,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2684420096,
+                "anew": 2684420096,
+                "mask": 4294901760,
+                "permflag": 7
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "ranges": [
+              {
+                "base": 150732800,
+                "anew": 150732800,
+                "mask": 4294901752,
+                "permflag": 7
+              },
+              {
+                "base": 2952790016,
+                "anew": 2952798720,
+                "mask": 4294966784,
+                "permflag": 7
+              },
+              {
+                "base": 2952792064,
+                "anew": 2952812544,
+                "mask": 4294965248,
+                "permflag": 7
+              },
+              {
+                "base": 2952826880,
+                "anew": 2952826880,
+                "mask": 4294963200,
+                "permflag": 7
+              },
+              {
+                "base": 2952830976,
+                "anew": 2952830976,
+                "mask": 4294959104,
+                "permflag": 7
+              },
+              {
+                "base": 2952839168,
+                "anew": 2952839168,
+                "mask": 4294950912,
+                "permflag": 7
+              },
+              {
+                "base": 2952855552,
+                "anew": 2952855552,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2147549184,
+                "anew": 2147549184,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2415984640,
+                "anew": 2415984640,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2684420096,
+                "anew": 2684420096,
+                "mask": 4294901760,
+                "permflag": 7
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "clk": 40000000,
+      "tdm": {
+        "period": 10000000,
+        "table": [
+          {
+            "id": 0,
+            "duration": 5000
+          },
+          {
+            "id": null,
+            "duration": 2000
+          }
+        ],
+        "OS": {
+          "id": null,
+          "duration": 2000
+        }
+      },
+      "idMem": {
+        "size": 128,
+        "maxBlocks": 32,
+        "used": 96,
+        "allocBlocks": [
+          {
+            "base": 0,
+            "size": 32,
+            "id": 0,
+            "lock": true,
+            "data": ""
+          },
+          {
+            "base": 65536,
+            "size": 64,
+            "id": 2,
+            "lock": true,
+            "data": "vep_1/partition_2_2/out.hex"
+          }
+        ]
+      },
+      "axiMMU": {
+        "tableSize": 16,
+        "table": [
+          {
+            "id": 2,
+            "ranges": [
+              {
+                "base": 150732800,
+                "anew": 150732800,
+                "mask": 4294901752,
+                "permflag": 7
+              },
+              {
+                "base": 2952790016,
+                "anew": 2952800768,
+                "mask": 4294966784,
+                "permflag": 7
+              },
+              {
+                "base": 2952792064,
+                "anew": 2952820736,
+                "mask": 4294965248,
+                "permflag": 7
+              },
+              {
+                "base": 2952826880,
+                "anew": 2952826880,
+                "mask": 4294963200,
+                "permflag": 7
+              },
+              {
+                "base": 2952830976,
+                "anew": 2952830976,
+                "mask": 4294959104,
+                "permflag": 7
+              },
+              {
+                "base": 2952839168,
+                "anew": 2952839168,
+                "mask": 4294950912,
+                "permflag": 7
+              },
+              {
+                "base": 2952855552,
+                "anew": 2952855552,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2147549184,
+                "anew": 2147549184,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2415984640,
+                "anew": 2415984640,
+                "mask": 4294901760,
+                "permflag": 7
+              },
+              {
+                "base": 2684420096,
+                "anew": 2684420096,
+                "mask": 4294901760,
+                "permflag": 7
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "VPs": [
+    0
+  ]
+}
