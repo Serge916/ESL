@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <arm_shared_memory.h>
+#include <unistd.h>
 /* warning: this is the RISC-V memory map!
  * use only in conjuction with arm_shared_memory_write/read
  */
@@ -194,6 +195,7 @@ int main(int argc, char **argv)
         break;
       }
     }
+    usleep(20);
   }
 
   // close the shared memory handle before exiting
