@@ -108,7 +108,7 @@ typedef volatile struct
 #ifdef VEP_TILE2_PARTITION2_SHARED_REGION_REMOTE_START
 typedef volatile struct
 {
-  private_memory_regions_t region;
+  uint32_t initialized;
 } vep_tile2_partition2_shared_region_t;
 #endif
 #ifdef VEP_TILE2_PARTITION3_SHARED_REGION_REMOTE_START

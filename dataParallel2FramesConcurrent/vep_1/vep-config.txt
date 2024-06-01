@@ -3,10 +3,10 @@
 ## - on each tile the system application takes the first 32 KiB
 ## - allocate 32KiB or 64KiB per partition, with a max of 128KiB per tile
 ##
-on tile 0 partition 1 has 8KiB stack in 32KiB memory starting at 32KiB
-on tile 1 partition 1 has 8KiB stack in 32KiB memory starting at 32KiB
-on tile 2 partition 1 has 8KiB stack in 32KiB memory starting at 32KiB
-on tile 2 partition 3 has 8KiB stack in 32KiB memory starting at 64KiB
+on tile 0 partition 1 has 16KiB stack in 32KiB memory starting at 32KiB
+on tile 1 partition 1 has 16KiB stack in 32KiB memory starting at 32KiB
+on tile 2 partition 1 has 16KiB stack in 32KiB memory starting at 32KiB
+on tile 2 partition 3 has 16KiB stack in 32KiB memory starting at 64KiB
 on tile 0 partition 2 has 0KiB stack in 64KiB memory starting at 64KiB
 on tile 1 partition 2 has 0KiB stack in 64KiB memory starting at 64KiB
 ##
@@ -31,5 +31,5 @@ in shared memory memshared0 shares 92KiB private memory starting at 36KiB
 ##
 on tile 0 partition 1 has 58000 cycles of 67000 starting at  7000
 on tile 1 partition 1 has 58000 cycles of 67000 starting at  7000
-on tile 2 partition 1 has 58000 cycles of 67000 starting at  7000
-on tile 2 partition 3 has 58000 cycles of 67000 starting at  7000
+on tile 2 partition 1 has 58000 cycles of 127000 starting at  7000
+on tile 2 partition 3 has 58000 cycles of 127000 starting at  67000

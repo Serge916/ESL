@@ -7,10 +7,9 @@ MEMORY {
 mem : ORIGIN = 0x0, LENGTH = 0x00008000 /* remove shared partition region, starting after the stack at LENGTH */
 mem0_partition2 : ORIGIN = 0x80010000, LENGTH = 0x00010000 /* vep=1 tile=0 partition=2 private shared memory region */
 mem1_partition2 : ORIGIN = 0x90010000, LENGTH = 0x00010000 /* vep=1 tile=1 partition=2 private shared memory region */
-mem2_partition2 : ORIGIN = 0xA0010000, LENGTH = 0x00010000 /* vep=1 tile=2 partition=2 private shared memory region */
 memshared0 : ORIGIN = 0xB0009000, LENGTH = 0x00017000 /* vep=1 private shared memory region */
 }
-_STACK_SIZE = 0x00002000;
+_STACK_SIZE = 0x00004000;
 OUTPUT_ARCH( "riscv" )
 ENTRY( _start )
 _STACK_SIZE = DEFINED(_STACK_SIZE) ? _STACK_SIZE : 0x1000;
@@ -41,7 +40,6 @@ SECTIONS
    } >mem
   .mem0_partition2 : { *(.mem0_partition2) } > mem0_partition2
   .mem1_partition2 : { *(.mem1_partition2) } > mem1_partition2
-  .mem2_partition2 : { *(.mem2_partition2) } > mem2_partition2
   .memshared0 : { *(.memshared0) } > memshared0
   _end = .;
   .stack (NOLOAD) : {

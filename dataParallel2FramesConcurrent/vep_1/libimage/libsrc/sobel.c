@@ -28,7 +28,7 @@ void sobel(uint8_t const volatile *const frame_in, uint32_t const xsize_in, uint
       -1, -2, -1};
 
   uint32_t y_offset = (frame_half == 0) ? 0 : ysize_in - block_ysize;
-  for (uint32_t y = 0; y < ysize_in; y++)
+  for (uint32_t y = 0; y < block_ysize; y++)
   {
     for (uint32_t x = 0; x < xsize_in; x++)
     {

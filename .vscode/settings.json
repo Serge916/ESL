@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "vep_shared_memory_regions.h": "c",
-        "xil_printf.h": "c"
+        "xil_printf.h": "c",
+        "string.h": "c"
     }
 }
