@@ -3,6 +3,10 @@
         "vep_shared_memory_regions.h": "c",
         "xil_printf.h": "c",
         "string.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "arm_shared_memory.h": "c",
+        "platform.h": "c",
+        "vep_memory_map.h": "c",
+        "fifo.h": "c"
     }
 }

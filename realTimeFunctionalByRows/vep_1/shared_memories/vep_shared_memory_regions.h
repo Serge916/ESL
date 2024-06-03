@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <fifo.h>
 #include "vep_memory_map.h"
 
 // IMPORTANT: to use a private memory region you must:
@@ -28,9 +29,16 @@ typedef struct
 } line_t;
 
 #ifdef VEP_MEMSHARED0_SHARED_REGION_REMOTE_START
+#define LINE_IN_BUFFER_SIZE 20
+#define LINE_OUT_BUFFER_SIZE 20
 typedef volatile struct
 {
   uint32_t initialized;
+  fifo_t admin_in;
+  fifo_t admin_out;
+  line_t lines_in[LINE_IN_BUFFER_SIZE];
+  line_t lines_out[LINE_OUT_BUFFER_SIZE];
+
 } vep_memshared0_shared_region_t;
 #endif
 
