@@ -7,6 +7,7 @@
         "arm_shared_memory.h": "c",
         "platform.h": "c",
         "vep_memory_map.h": "c",
-        "fifo.h": "c"
+        "fifo.h": "c",
+        "string_view": "c"
     }
 }

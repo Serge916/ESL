@@ -21,6 +21,12 @@ tile-mmu-add  0 1 4 0xB000A000 0xB000A000 0xFFFFE000
 tile-mmu-add  0 1 5 0xB000C000 0xB000C000 0xFFFFC000
 tile-mmu-add  0 1 6 0xB0010000 0xB0010000 0xFFFF0000
 # memory regions shared by partitions in instruction/data memories
+tile-mmu-add  0 1 7 0x9001C800 0x9001C800 0xFFFFF800
+tile-mmu-add  0 1 8 0x9001D000 0x9001D000 0xFFFFF000
+tile-mmu-add  0 1 9 0x9001E000 0x9001E000 0xFFFFE000
+tile-mmu-add  0 1 10 0xA001C800 0xA001C800 0xFFFFF800
+tile-mmu-add  0 1 11 0xA001D000 0xA001D000 0xFFFFF000
+tile-mmu-add  0 1 12 0xA001E000 0xA001E000 0xFFFFE000
 tile-mem-add  0 2 32k 0x10000
 tile-mem-data 0 2 vep_1/partition_0_2/out.hex
 # global & partition timers
@@ -35,10 +41,16 @@ tile-mmu-add  0 2 4 0xB000A000 0xB000A000 0xFFFFE000
 tile-mmu-add  0 2 5 0xB000C000 0xB000C000 0xFFFFC000
 tile-mmu-add  0 2 6 0xB0010000 0xB0010000 0xFFFF0000
 # memory regions shared by partitions in instruction/data memories
+tile-mmu-add  0 2 7 0x9001C800 0x9001C800 0xFFFFF800
+tile-mmu-add  0 2 8 0x9001D000 0x9001D000 0xFFFFF000
+tile-mmu-add  0 2 9 0x9001E000 0x9001E000 0xFFFFE000
+tile-mmu-add  0 2 10 0xA001C800 0xA001C800 0xFFFFF800
+tile-mmu-add  0 2 11 0xA001D000 0xA001D000 0xFFFFF000
+tile-mmu-add  0 2 12 0xA001E000 0xA001E000 0xFFFFE000
 tile-tdm-add  0 0 5000
 tile-tdm-add  0 1 58000
 tile-tdm-add  0 2 58000
-tile-mem-add  1 1 32k 0x8000
+tile-mem-add  1 1 64k 0x10000
 tile-mem-data 1 1 vep_1/partition_1_1/out.hex
 # global & partition timers
 tile-mmu-add  1 1 0 0x08FC0000 0x08FC0000 0xFFFEFFF8
@@ -52,9 +64,15 @@ tile-mmu-add  1 1 4 0xB000A000 0xB000A000 0xFFFFE000
 tile-mmu-add  1 1 5 0xB000C000 0xB000C000 0xFFFFC000
 tile-mmu-add  1 1 6 0xB0010000 0xB0010000 0xFFFF0000
 # memory regions shared by partitions in instruction/data memories
+tile-mmu-add  1 1 7 0x9001C800 0x9001C800 0xFFFFF800
+tile-mmu-add  1 1 8 0x9001D000 0x9001D000 0xFFFFF000
+tile-mmu-add  1 1 9 0x9001E000 0x9001E000 0xFFFFE000
+tile-mmu-add  1 1 10 0xA001C800 0xA001C800 0xFFFFF800
+tile-mmu-add  1 1 11 0xA001D000 0xA001D000 0xFFFFF000
+tile-mmu-add  1 1 12 0xA001E000 0xA001E000 0xFFFFE000
 tile-tdm-add  1 0 5000
 tile-tdm-add  1 1 58000
-tile-mem-add  2 1 32k 0x8000
+tile-mem-add  2 1 64k 0x10000
 tile-mem-data 2 1 vep_1/partition_2_1/out.hex
 # global & partition timers
 tile-mmu-add  2 1 0 0x08FC0000 0x08FC0000 0xFFFEFFF8
@@ -68,5 +86,11 @@ tile-mmu-add  2 1 4 0xB000A000 0xB000A000 0xFFFFE000
 tile-mmu-add  2 1 5 0xB000C000 0xB000C000 0xFFFFC000
 tile-mmu-add  2 1 6 0xB0010000 0xB0010000 0xFFFF0000
 # memory regions shared by partitions in instruction/data memories
+tile-mmu-add  2 1 7 0x9001C800 0x9001C800 0xFFFFF800
+tile-mmu-add  2 1 8 0x9001D000 0x9001D000 0xFFFFF000
+tile-mmu-add  2 1 9 0x9001E000 0x9001E000 0xFFFFE000
+tile-mmu-add  2 1 10 0xA001C800 0xA001C800 0xFFFFF800
+tile-mmu-add  2 1 11 0xA001D000 0xA001D000 0xFFFFF000
+tile-mmu-add  2 1 12 0xA001E000 0xA001E000 0xFFFFE000
 tile-tdm-add  2 0 5000
 tile-tdm-add  2 1 58000

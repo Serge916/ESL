@@ -18,6 +18,12 @@
 // it should be the same as the vep-config.txt from which it is generated
 
 #define MAX_LINE_SIZE 462
+#define LINE_IN_BUFFER_SIZE 20
+#define LINE_OUT_BUFFER_SIZE 20
+#define CONVOLUTION_BUFFER_IN_SIZE 10
+#define CONVOLUTION_BUFFER_OUT_SIZE 10
+#define SOBEL_BUFFER_IN_SIZE 2
+#define SOBEL_BUFFER_OUT_SIZE 2
 
 typedef struct
 {
@@ -29,8 +35,6 @@ typedef struct
 } line_t;
 
 #ifdef VEP_MEMSHARED0_SHARED_REGION_REMOTE_START
-#define LINE_IN_BUFFER_SIZE 20
-#define LINE_OUT_BUFFER_SIZE 20
 typedef volatile struct
 {
   uint32_t initialized;
@@ -69,7 +73,10 @@ typedef volatile struct
 #ifdef VEP_TILE1_PARTITION1_SHARED_REGION_REMOTE_START
 typedef volatile struct
 {
-  uint32_t initialized;
+  fifo_t admin_conv_in;
+  fifo_t admin_conv_out;
+  line_t lines_in[CONVOLUTION_BUFFER_IN_SIZE];
+  line_t lines_out[CONVOLUTION_BUFFER_OUT_SIZE];
 } vep_tile1_partition1_shared_region_t;
 #endif
 #ifdef VEP_TILE1_PARTITION2_SHARED_REGION_REMOTE_START
@@ -93,7 +100,10 @@ typedef volatile struct
 #ifdef VEP_TILE2_PARTITION1_SHARED_REGION_REMOTE_START
 typedef volatile struct
 {
-  uint32_t initialized;
+  fifo_t admin_sobel_in;
+  fifo_t admin_sobel_out;
+  line_t lines_in[SOBEL_BUFFER_IN_SIZE];
+  line_t lines_out[SOBEL_BUFFER_OUT_SIZE];
 } vep_tile2_partition1_shared_region_t;
 #endif
 #ifdef VEP_TILE2_PARTITION2_SHARED_REGION_REMOTE_START

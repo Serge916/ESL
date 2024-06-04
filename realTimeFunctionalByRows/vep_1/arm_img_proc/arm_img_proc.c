@@ -19,18 +19,17 @@ vep_memshared0_shared_region_t volatile *data_in_shared_mem = NULL;
 
 int main(int argc, char **argv)
 {
-  printf("Hello :)");
   if (argc < 2)
   {
     fprintf(stderr, "Usage: %s infile ...\n", argv[0]);
     return 1;
   }
-  uint32_t nr_files = argc - 1;
+  uint32_t nr_files = argc;
   data_in_shared_mem = arm_shared_memory_init();
   fifo_t volatile *const admin_in = &data_in_shared_mem->admin_in;
   fifo_t volatile *const admin_out = &data_in_shared_mem->admin_out;
-  line_t volatile **const lines_in = &data_in_shared_mem->lines_in;
-  line_t volatile **const lines_out = &data_in_shared_mem->lines_out;
+  line_t volatile *const lines_in = data_in_shared_mem->lines_in;
+  line_t volatile *const lines_out = data_in_shared_mem->lines_out;
 
   // wait until the RISC-V has initialised both fifos
   printf("Initializing FIFOs\n");
@@ -39,7 +38,7 @@ int main(int argc, char **argv)
   }
   printf("FIFOs ready!\n");
 
-  for (uint32_t f = 0; f < nr_files; f++)
+  for (uint32_t f = 1; f <= nr_files; f++)
   {
     // read BMP
     uint32_t xsize_snd, ysize_snd, bitsperpixel_snd;
@@ -55,26 +54,27 @@ int main(int argc, char **argv)
       arm_shared_memory_close();
       return 1;
     }
+    uint32_t const bytes_snd = xsize_snd * ysize_snd * (bitsperpixel_snd / 8);
+    uint32_t const bytes_per_line = xsize_snd * bitsperpixel_snd / 8;
     if (xsize_snd > MAX_LINE_SIZE)
     {
       printf("Image (%s) doesn't fit in allocated memory\n", argv[f]);
       continue;
     }
-    // Allocate space for frame out
+    // Allocate space for frame out. In stack to avoid malloc.
     uint8_t frame_out[MAX_IMG_SIZE] = {0};
     printf("Processing file %s\n", argv[f]);
-    uint32_t const bytes_snd = xsize_snd * ysize_snd * (bitsperpixel_snd / 8);
-    uint32_t const bytes_per_line = xsize_snd * bitsperpixel_snd / 8;
 
-    while (image_finished == 0)
+    // Loop unrolling
+    if (bitsperpixel_snd < 24)
     {
-      if (inserted_lines < ysize_snd)
+      while (image_finished == 0)
       {
         uint32_t available_slots_in = fifo_spaces(admin_in);
-        for (uint32_t i = 0; i < available_slots_in; i++)
+        for (uint32_t k = 0; k < available_slots_in && inserted_lines < ysize_snd; k++, inserted_lines++)
         {
           uint32_t space_index = fifo_claim_space(admin_in);
-          line_t *line_in = &lines_in[space_index];
+          line_t volatile *line_in = &lines_in[space_index];
           line_in->length = xsize_snd;
           line_in->y_position = inserted_lines;
           line_in->y_size = ysize_snd;
@@ -83,31 +83,80 @@ int main(int argc, char **argv)
           {
             line_in->pixel_space[j] = frame_snd[inserted_lines * xsize_snd + j];
           }
-          fifo_release_space(admin_in);
-          inserted_lines++;
+          fifo_release_token(admin_in);
         }
-      }
 
-      uint32_t pending_slots_out = fifo_tokens(admin_out);
-      for (uint32_t i = 0; i < pending_slots_out; i++)
+        uint32_t pending_slots_out = fifo_tokens(admin_out);
+        for (uint32_t i = 0; i < pending_slots_out; i++)
+        {
+          uint32_t token_index = fifo_claim_token(admin_out);
+          line_t volatile *line_out = &lines_out[token_index];
+          uint32_t y_position = line_out->y_position;
+          uint32_t length = line_out->length;
+          for (uint32_t j = 0; j < length; j++)
+          {
+            frame_out[y_position * length + j] = line_out->pixel_space[j];
+          }
+          fifo_release_token(admin_out);
+          processed_lines++;
+          // Conditional in this scope to avoid True without having taken any line out
+          if (y_position >= ysize_snd - 1)
+          {
+            image_finished = 1;
+          }
+        }
+
+        usleep(20);
+      }
+    }
+    // It is RGB
+    else
+    {
+      while (image_finished == 0)
       {
-        uint32_t token_index = fifo_claim_token(admin_out);
-        line_t *line_out = &lines_out[token_index];
-        uint32_t y_position = line_out->y_position;
-        uint32_t length = line_out->length;
-        for (uint32_t j = 0; j < length; j++)
+        uint32_t available_slots_in = fifo_spaces(admin_in);
+        for (uint32_t k = 0; k < available_slots_in && inserted_lines < ysize_snd; k++, inserted_lines++)
         {
-          frame_out[y_position * length + j] = line_out->pixel_space[j];
+          // printf("Inserted lines: %d", inserted_lines);
+          for (uint32_t i = 0; i < 3; i++)
+          {
+            uint32_t space_index = fifo_claim_space(admin_in);
+            line_t volatile *line_in = &lines_in[space_index];
+            line_in->length = xsize_snd;
+            line_in->y_position = inserted_lines;
+            line_in->y_size = ysize_snd;
+            line_in->isRGB = bitsperpixel_snd > 8 ? 1 : 0;
+            for (uint32_t j = 0; j < xsize_snd; j++)
+            {
+              line_in->pixel_space[j] = frame_snd[(inserted_lines * 3 + i) * xsize_snd + j];
+            }
+            fifo_release_token(admin_in);
+          }
         }
-        processed_lines++;
-        // Conditional in this scope to avoid True without having taken any line out
-        if (y_position >= ysize_snd - 1)
-        {
-          image_finished = 1;
-        }
-      }
 
-      usleep(20);
+        uint32_t pending_slots_out = fifo_tokens(admin_out);
+        printf("Output lines: %d from %d\n", pending_slots_out, processed_lines);
+        for (uint32_t i = 0; i < pending_slots_out; i++)
+        {
+          uint32_t token_index = fifo_claim_token(admin_out);
+          line_t volatile const *line_out = &lines_out[token_index];
+          uint32_t y_position = line_out->y_position;
+          uint32_t length = line_out->length;
+          for (uint32_t j = 0; j < length; j++)
+          {
+            frame_out[y_position * length + j] = line_out->pixel_space[j];
+          }
+          fifo_release_space(admin_out);
+          processed_lines++;
+          // Conditional in this scope to avoid True without having taken any line out
+          if (y_position >= ysize_snd - 1)
+          {
+            image_finished = 1;
+          }
+        }
+
+        usleep(20);
+      }
     }
 
     printf("Finished after inserting %d and processing %d lines\n", inserted_lines, processed_lines);
