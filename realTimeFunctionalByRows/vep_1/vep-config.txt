@@ -18,8 +18,8 @@ on tile 2 partition 1 has 16KiB stack in 64KiB memory starting at 64KiB
 ## - use shared_memories/vep_shared_memories.h to manage shared memories
 ##
 ##on tile 0 partition 2 shares 64KiB private memory
-on tile 1 partition 1 shares 14KiB private memory
-on tile 2 partition 1 shares 14KiB private memory
+on tile 1 partition 1 shares 32KiB private memory
+on tile 2 partition 1 shares 32KiB private memory
 in shared memory memshared0 shares 92KiB private memory starting at 36KiB
 ##
 ## schedule for partitions that have a memory allocation

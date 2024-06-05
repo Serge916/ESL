@@ -29,9 +29,7 @@ int main(void)
   }
   fifo_print_status(&MEM2->admin_sobel_out);
 
-  // uint64_t t;
-  // t = read_global_timer();
-  // xil_printf("%04u/%010u: Hello :)\n", (uint32_t)(t >> 32), (uint32_t)t);
+  uint64_t t;
   line_t line_in;
   line_t line_out;
   uint8_t bytes_in[3][MAX_LINE_SIZE] = {0};
@@ -56,15 +54,41 @@ int main(void)
       bytes_in[2][j] = line_in.pixel_space[j];
     }
     // If there are not enough lines yet, continue
-    if (line_in.y_position < 2)
+    if (line_in.y_position < 1)
     {
       continue;
     }
+    // First run
+    if (line_in.y_position == 1)
+    {
+      // Y position is one position lower than last line
+      uint32_t y_position = 0;
+      uint32_t length = line_in.length;
+      uint32_t y_size = line_in.y_size;
+
+      t = read_global_timer();
+      xil_printf("%04u/%010u: Sobel: %d\n", (uint32_t)(t >> 32), (uint32_t)t, y_position);
+
+      // sobel
+      uint8_t threshold = line_in.isRGB ? 128 : 100;
+      sobel(&bytes_in[1], length, y_position, y_size, threshold, line_out.pixel_space);
+      // Format line out
+      line_out.y_position = y_position;
+      line_out.y_size = y_size;
+      line_out.length = length;
+      line_out.isRGB = line_in.isRGB;
+      fifo_write_token(&MEM2->admin_sobel_out, &line_out);
+      continue;
+    }
+
     // Y position is one position lower than last line
     uint32_t y_position = line_in.y_position - 1;
     uint32_t length = line_in.length;
     uint32_t y_size = line_in.y_size;
-    xil_printf("Sobel: %d\n", y_position);
+
+    t = read_global_timer();
+    xil_printf("%04u/%010u: Sobel: %d\n", (uint32_t)(t >> 32), (uint32_t)t, y_position);
+
     // sobel
     uint8_t threshold = line_in.isRGB ? 128 : 100;
     sobel(bytes_in, length, y_position, y_size, threshold, line_out.pixel_space);
@@ -74,6 +98,21 @@ int main(void)
     line_out.length = length;
     line_out.isRGB = line_in.isRGB;
     fifo_write_token(&MEM2->admin_sobel_out, &line_out);
+
+    if (line_in.y_position == line_in.y_size - 1)
+    {
+      y_position++;
+      t = read_global_timer();
+      xil_printf("%04u/%010u: Convoluting: %d\n", (uint32_t)(t >> 32), (uint32_t)t, y_position);
+
+      sobel(bytes_in, length, y_position, y_size, threshold, line_out.pixel_space);
+
+      line_out.y_position = y_position;
+      line_out.y_size = y_size;
+      line_out.length = length;
+      line_out.isRGB = line_in.isRGB;
+      fifo_write_token(&MEM2->admin_sobel_out, &line_out);
+    }
   }
 
   return 0;

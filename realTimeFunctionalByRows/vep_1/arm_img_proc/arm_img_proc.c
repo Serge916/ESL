@@ -65,13 +65,15 @@ int main(int argc, char **argv)
     uint8_t frame_out[MAX_IMG_SIZE] = {0};
     printf("Processing file %s\n", argv[f]);
 
-    // Loop unrolling
-    if (bitsperpixel_snd < 24)
+    uint32_t line_dimension = bitsperpixel_snd / 8;
+
+    while (image_finished == 0)
     {
-      while (image_finished == 0)
+      uint32_t available_slots_in = fifo_spaces(admin_in);
+      if (available_slots_in > line_dimension && inserted_lines < ysize_snd)
       {
-        uint32_t available_slots_in = fifo_spaces(admin_in);
-        for (uint32_t k = 0; k < available_slots_in && inserted_lines < ysize_snd; k++, inserted_lines++)
+        // printf("Inserted lines: %d", inserted_lines);
+        for (uint32_t i = 0; i < line_dimension; i++)
         {
           uint32_t space_index = fifo_claim_space(admin_in);
           line_t volatile *line_in = &lines_in[space_index];
@@ -79,84 +81,35 @@ int main(int argc, char **argv)
           line_in->y_position = inserted_lines;
           line_in->y_size = ysize_snd;
           line_in->isRGB = bitsperpixel_snd > 8 ? 1 : 0;
-          for (uint32_t j = 0; j < bytes_per_line; j++)
+          for (uint32_t j = 0; j < xsize_snd; j++)
           {
-            line_in->pixel_space[j] = frame_snd[inserted_lines * xsize_snd + j];
+            line_in->pixel_space[j] = frame_snd[(inserted_lines * 3 + i) * xsize_snd + j];
           }
           fifo_release_token(admin_in);
         }
-
-        uint32_t pending_slots_out = fifo_tokens(admin_out);
-        for (uint32_t i = 0; i < pending_slots_out; i++)
-        {
-          uint32_t token_index = fifo_claim_token(admin_out);
-          line_t volatile *line_out = &lines_out[token_index];
-          uint32_t y_position = line_out->y_position;
-          uint32_t length = line_out->length;
-          for (uint32_t j = 0; j < length; j++)
-          {
-            frame_out[y_position * length + j] = line_out->pixel_space[j];
-          }
-          fifo_release_token(admin_out);
-          processed_lines++;
-          // Conditional in this scope to avoid True without having taken any line out
-          if (y_position >= ysize_snd - 1)
-          {
-            image_finished = 1;
-          }
-        }
-
-        usleep(20);
+        inserted_lines++;
       }
-    }
-    // It is RGB
-    else
-    {
-      while (image_finished == 0)
+
+      if (fifo_tokens(admin_out))
       {
-        uint32_t available_slots_in = fifo_spaces(admin_in);
-        for (uint32_t k = 0; k < available_slots_in && inserted_lines < ysize_snd; k++, inserted_lines++)
+        uint32_t token_index = fifo_claim_token(admin_out);
+        line_t volatile const *line_out = &lines_out[token_index];
+        uint32_t y_position = line_out->y_position;
+        uint32_t length = line_out->length;
+        for (uint32_t j = 0; j < length; j++)
         {
-          // printf("Inserted lines: %d", inserted_lines);
-          for (uint32_t i = 0; i < 3; i++)
-          {
-            uint32_t space_index = fifo_claim_space(admin_in);
-            line_t volatile *line_in = &lines_in[space_index];
-            line_in->length = xsize_snd;
-            line_in->y_position = inserted_lines;
-            line_in->y_size = ysize_snd;
-            line_in->isRGB = bitsperpixel_snd > 8 ? 1 : 0;
-            for (uint32_t j = 0; j < xsize_snd; j++)
-            {
-              line_in->pixel_space[j] = frame_snd[(inserted_lines * 3 + i) * xsize_snd + j];
-            }
-            fifo_release_token(admin_in);
-          }
+          frame_out[y_position * length + j] = line_out->pixel_space[j];
         }
-
-        uint32_t pending_slots_out = fifo_tokens(admin_out);
-        printf("Output lines: %d from %d\n", pending_slots_out, processed_lines);
-        for (uint32_t i = 0; i < pending_slots_out; i++)
+        fifo_release_space(admin_out);
+        processed_lines++;
+        // Conditional in this scope to avoid True without having taken any line out
+        if (y_position >= ysize_snd - 1)
         {
-          uint32_t token_index = fifo_claim_token(admin_out);
-          line_t volatile const *line_out = &lines_out[token_index];
-          uint32_t y_position = line_out->y_position;
-          uint32_t length = line_out->length;
-          for (uint32_t j = 0; j < length; j++)
-          {
-            frame_out[y_position * length + j] = line_out->pixel_space[j];
-          }
-          fifo_release_space(admin_out);
-          processed_lines++;
-          // Conditional in this scope to avoid True without having taken any line out
-          if (y_position >= ysize_snd - 1)
-          {
-            image_finished = 1;
-          }
+          image_finished = 1;
         }
-
-        usleep(20);
       }
+
+      usleep(20);
     }
 
     printf("Finished after inserting %d and processing %d lines\n", inserted_lines, processed_lines);

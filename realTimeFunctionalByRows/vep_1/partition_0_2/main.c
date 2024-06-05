@@ -32,12 +32,6 @@ int main(void)
   while (!(fifo_initialized(&MEM2->admin_sobel_out) && fifo_initialized(&MEM1->admin_conv_out)))
   {
   }
-  // while (!(fifo_initialized(&MEM2->admin_sobel_out)))
-  // {
-  // }
-  // while (!(fifo_initialized(&MEM2->admin_sobel_out)))
-  // {
-  // }
 
   while (1)
   {
@@ -45,21 +39,14 @@ int main(void)
     {
       continue;
     }
-    // if (!(fifo_tokens(&MEM2->admin_sobel_out)))
-    // {
-    //   continue;
-    // }
-    // if (!(fifo_tokens(&MEM1->admin_conv_out)))
-    // {
-    //   continue;
-    // }
 
     fifo_read_token(&MEM2->admin_sobel_out, &line_in_sobel);
     fifo_read_token(&MEM1->admin_conv_out, &line_in_conv);
     uint32_t length = line_in_conv.length;
     if (line_in_sobel.y_position != line_in_conv.y_position)
     {
-      xil_printf("Lines do not belong together\n");
+      t = read_global_timer();
+      xil_printf("%04u/%010u: Lines do not belong together. Sobel %d, conv %d\n", (uint32_t)(t >> 32), (uint32_t)t, line_in_sobel.y_position, line_in_conv.y_position);
       continue;
     }
 
