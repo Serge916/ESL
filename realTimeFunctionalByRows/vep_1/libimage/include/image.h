@@ -16,7 +16,7 @@ extern void convolution(uint8_t const volatile *const lines_in, uint32_t const v
 extern void scale(uint8_t const volatile *const frame_in, uint32_t const xsize_in, uint32_t const vysize_in, uint32_t const bitsperpixel_in,
                   uint32_t const xsize_out, uint32_t const ysize_out, uint8_t volatile *const frame_out);
 // frame_out may be the same as frame_in
-extern void greyscale(uint8_t const volatile **const bytes_in, uint32_t const length, uint32_t const bitsperpixel_in,
+extern void greyscale(uint8_t const volatile *const bytes_in, uint32_t const length, uint32_t const bitsperpixel_in,
                       uint8_t volatile *const bytes_out);
 // frame_out may be the same as frame_in1 or frame_in2
 extern void overlay(uint8_t const volatile *const line_in_1, uint8_t const volatile *const line_in_2, uint32_t volatile length, double const ratio, uint8_t volatile *const line_out);

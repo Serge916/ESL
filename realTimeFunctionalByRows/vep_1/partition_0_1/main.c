@@ -23,8 +23,8 @@ int main(void)
   }
   fifo_print_status(&MEM0->admin_in);
   // Wait for Convolution buffer initialization
-  // while (!fifo_initialized(&MEM0->admin_out))
-  while (!fifo_initialized(&MEM1->admin_conv_in))
+  // while (!fifo_initialized(&MEM1->admin_conv_in))
+  while (!fifo_initialized(&MEM0->admin_out))
   {
   }
   line_t lines_in[3];
@@ -53,16 +53,16 @@ int main(void)
         t = read_global_timer();
         xil_printf("%04u/%010u: Greyscaling: %d\n", (uint32_t)(t >> 32), (uint32_t)t, lines_in[2].y_position);
 
+        length = lines_in[0].length;
         uint8_t *bytes_in[3] = {lines_in[0].pixel_space, lines_in[1].pixel_space, lines_in[2].pixel_space};
         greyscale(bytes_in, length, 24, line_out.pixel_space);
         line_out.y_position = lines_in[0].y_position;
         line_out.y_size = lines_in[0].y_size;
-        line_out.length = lines_in[0].length;
+        line_out.length = length;
         line_out.isRGB = 1;
 
-        // fifo_write_token(&MEM0->admin_out, &line_out);
-        fifo_write_token(&MEM1->admin_conv_in, &line_out);
-        fifo_print_status(&MEM1->admin_conv_in);
+        fifo_write_token(&MEM0->admin_out, &line_out);
+        // fifo_write_token(&MEM1->admin_conv_in, &line_out);
       } // If greyscale, output it
       else
       {

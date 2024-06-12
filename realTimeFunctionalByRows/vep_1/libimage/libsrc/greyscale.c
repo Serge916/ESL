@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <xil_printf.h>
 
 void greyscale(uint8_t const volatile **const bytes_in, uint32_t const length, uint32_t const bitsperpixel_in,
                uint8_t volatile *const bytes_out)
