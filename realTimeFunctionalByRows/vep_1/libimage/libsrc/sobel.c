@@ -6,26 +6,26 @@
 #include <xil_printf.h>
 #include "../include/image.h"
 
-const int fxsize = 3, fysize = 3;
-int32_t const sobelx[] = {
-    -1,
-    0,
-    1,
-    -2,
-    0,
-    2,
-    -1,
-    0,
-    1,
-};
-int32_t const sobely[] = {
-    1, 2, 1,
-    0, 0, 0,
-    -1, -2, -1};
-
-void sobel(uint8_t const volatile *const *const lines_in, uint32_t const length, uint32_t const y_position, uint32_t const y_size,
+void sobel(uint8_t const volatile *const lines_in, uint32_t const length, uint32_t const y_position, uint32_t const y_size,
            uint8_t const threshold, uint8_t volatile *const line_out)
 {
+  const int fxsize = 3, fysize = 3;
+  int32_t const sobelx[] = {
+      -1,
+      0,
+      1,
+      -2,
+      0,
+      2,
+      -1,
+      0,
+      1,
+  };
+  int32_t const sobely[] = {
+      1, 2, 1,
+      0, 0, 0,
+      -1, -2, -1};
+
   for (uint32_t x = 0; x < length; x++)
   {
     // don't create edge at borders
@@ -40,8 +40,8 @@ void sobel(uint8_t const volatile *const *const lines_in, uint32_t const length,
       {
         for (int32_t tx = 0; tx < fxsize; tx++)
         {
-          xr += sobelx[ty * fxsize + tx] * lines_in[ty - fysize / 2][x + tx - fxsize / 2];
-          yr += sobely[ty * fxsize + tx] * lines_in[ty - fysize / 2][x + tx - fxsize / 2];
+          xr += sobelx[ty * fxsize + tx] * lines_in[ty * fysize + x + tx - fxsize / 2];
+          yr += sobely[ty * fxsize + tx] * lines_in[ty * fysize + x + tx - fxsize / 2];
         }
       }
       // gradient magnitude

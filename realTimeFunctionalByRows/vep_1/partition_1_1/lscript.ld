@@ -6,7 +6,7 @@
 MEMORY {
 mem : ORIGIN = 0x0, LENGTH = 0x00008000 /* remove shared partition region, starting after the stack at LENGTH */
 mem1_partition1 : ORIGIN = 0x90018000, LENGTH = 0x00008000 /* vep=1 tile=1 partition=1 private shared memory region */
-mem2_partition1 : ORIGIN = 0xA0018000, LENGTH = 0x00008000 /* vep=1 tile=2 partition=1 private shared memory region */
+mem2_partition1 : ORIGIN = 0xA001B000, LENGTH = 0x00005000 /* vep=1 tile=2 partition=1 private shared memory region */
 memshared0 : ORIGIN = 0xB0009000, LENGTH = 0x00017000 /* vep=1 private shared memory region */
 }
 _STACK_SIZE = 0x00004000;

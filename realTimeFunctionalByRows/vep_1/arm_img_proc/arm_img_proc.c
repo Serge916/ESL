@@ -83,7 +83,7 @@ int main(int argc, char **argv)
           line_in->isRGB = bitsperpixel_snd > 8 ? 1 : 0;
           for (uint32_t j = 0; j < xsize_snd; j++)
           {
-            line_in->pixel_space[j] = frame_snd[(inserted_lines * 3 + i) * xsize_snd + j];
+            line_in->pixel_space[j] = frame_snd[inserted_lines * bytes_per_line + (j + i) * line_dimension];
           }
           fifo_release_token(admin_in);
         }
@@ -92,15 +92,18 @@ int main(int argc, char **argv)
 
       if (fifo_tokens(admin_out))
       {
-        uint32_t token_index = fifo_claim_token(admin_out);
+        uint32_t volatile token_index = fifo_claim_token(admin_out);
         line_t volatile const *line_out = &lines_out[token_index];
-        uint32_t y_position = line_out->y_position;
-        uint32_t length = line_out->length;
+        uint32_t volatile y_position = line_out->y_position;
+        uint32_t volatile length = line_out->length;
+        uint32_t volatile y_size = line_out->y_size;
         for (uint32_t j = 0; j < length; j++)
         {
           frame_out[y_position * length + j] = line_out->pixel_space[j];
         }
         fifo_release_space(admin_out);
+        printf("Line out: %d/%d\n", y_position, y_size);
+        printf("Pixel value: 0x%x\n", frame_out[20]);
         processed_lines++;
         // Conditional in this scope to avoid True without having taken any line out
         if (y_position >= ysize_snd - 1)

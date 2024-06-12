@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <math.h>
+#include <xil_printf.h>
 
 double const conv_sharpen3[] = {
     -1,
@@ -137,7 +138,7 @@ double const conv_gaussianblur5[] = {
     1 / 256.0,
 };
 
-void convolution(uint8_t const volatile *const *const lines_in, uint32_t const volatile length, uint32_t const volatile y_position, uint32_t const volatile y_size,
+void convolution(uint8_t const volatile *const lines_in, uint32_t const volatile length, uint32_t const volatile y_position, uint32_t const volatile y_size,
                  double const *const f, uint32_t const fxsize, uint32_t const fysize, uint8_t volatile *const line_out)
 {
   uint32_t fx_half_size = fxsize / 2;
@@ -152,11 +153,11 @@ void convolution(uint8_t const volatile *const *const lines_in, uint32_t const v
         if (x + tx >= fx_half_size && x + tx - fx_half_size < length && y_position + ty >= fy_half_size &&
             y_position + ty - fy_half_size < y_size)
         {
-          r += f[ty * fxsize + tx] * lines_in[ty][tx + x - fx_half_size];
+          r += f[ty * fxsize + tx] * lines_in[ty * fysize + tx + x - fx_half_size];
         }
         else
         {
-          r += f[ty * fxsize + tx] * lines_in[fy_half_size][x];
+          r += f[ty * fxsize + tx] * lines_in[fy_half_size * fysize + x];
         }
         // clip/saturate to uint8_t
         if (r < 0)

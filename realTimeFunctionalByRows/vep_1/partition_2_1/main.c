@@ -103,9 +103,9 @@ int main(void)
     {
       y_position++;
       t = read_global_timer();
-      xil_printf("%04u/%010u: Convoluting: %d\n", (uint32_t)(t >> 32), (uint32_t)t, y_position);
+      xil_printf("%04u/%010u: Sobel: %d\n", (uint32_t)(t >> 32), (uint32_t)t, y_position);
 
-      sobel(bytes_in, length, y_position, y_size, threshold, line_out.pixel_space);
+      sobel((uint8_t *)bytes_in, length, y_position, y_size, threshold, line_out.pixel_space);
 
       line_out.y_position = y_position;
       line_out.y_size = y_size;
