@@ -23,8 +23,7 @@ int main(void)
   }
   fifo_print_status(&MEM0->admin_in);
   // Wait for Convolution buffer initialization
-  // while (!fifo_initialized(&MEM1->admin_conv_in))
-  while (!fifo_initialized(&MEM0->admin_out))
+  while (!fifo_initialized(&MEM1->admin_conv_in))
   {
   }
   line_t lines_in[3];
@@ -61,8 +60,7 @@ int main(void)
         line_out.length = length;
         line_out.isRGB = 1;
 
-        fifo_write_token(&MEM0->admin_out, &line_out);
-        // fifo_write_token(&MEM1->admin_conv_in, &line_out);
+        fifo_write_token(&MEM1->admin_conv_in, &line_out);
       } // If greyscale, output it
       else
       {
