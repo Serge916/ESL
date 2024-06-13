@@ -11,8 +11,8 @@ extern double const conv_avgxy5[];
 extern double const conv_avgx3[];
 extern double const conv_avgxy7[];
 extern double const conv_gaussianblur5[];
-void convolution(uint8_t const volatile *const frame_in, uint32_t const volatile xsize_in, uint32_t const volatile ysize_in, uint32_t const volatile lines_per_thread, uint32_t const volatile bytes_per_pixel,
-                 double const *const f, uint32_t const fxsize, uint32_t const fysize, uint8_t volatile *const frame_out, uint32_t const frame_half, uint32_t const initial_y);
+void convolution(uint8_t const volatile *const frame_in, uint32_t const volatile xsize_in, uint32_t const volatile ysize_in, uint32_t const volatile lines_in_frame,
+                 double const *const f, uint32_t const filter_size, uint8_t volatile *const frame_out, uint32_t const frame_half, uint32_t const initial_y);
 extern void scale(uint8_t const volatile *const frame_in, uint32_t const xsize_in, uint32_t const vysize_in, uint32_t const bitsperpixel_in,
                   uint32_t const xsize_out, uint32_t const ysize_out, uint8_t volatile *const frame_out);
 // frame_out may be the same as frame_in

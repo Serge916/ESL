@@ -9,7 +9,6 @@
 
 #define MEM0 vep_memshared0_shared_region
 #define MEM1 vep_tile1_partition2_shared_region
-#define MEM2 vep_tile2_partition2_shared_region
 // GREYSCALE NODE
 int main(void)
 {
@@ -23,24 +22,34 @@ int main(void)
         case 0:
             break;
         case 1:
+            t = read_global_timer();
             xil_printf("%04u/%010u: Greyscaling\n", (uint32_t)(t >> 32), (uint32_t)t);
-            pixels_in_block = MEM0->current_work.bytes_per_pixel * MEM0->current_work.lines_in_block * MEM0->current_work.x_size;
+            pixels_in_block = MEM0->current_work.lines_in_block * MEM0->current_work.x_size;
             if (MEM0->current_work.bytes_per_pixel == 3)
             {
-                greyscale(MEM0->pixel_space, MEM0->current_work.bytes_per_pixel, pixels_in_block, MEM0->pixel_space);
+                greyscale(&MEM0->pixel_space[2 * MEM0->current_work.x_size], MEM0->current_work.bytes_per_pixel, pixels_in_block, &MEM0->pixel_space[2 * MEM0->current_work.x_size]);
             }
+
+            t = read_global_timer();
+            xil_printf("%04u/%010u: Finished greyscaling\n", (uint32_t)(t >> 32), (uint32_t)t);
             MEM0->current_work.busy = 2;
             break;
         case 2:
             break;
         case 3:
+            t = read_global_timer();
             xil_printf("%04u/%010u: Overlaying\n", (uint32_t)(t >> 32), (uint32_t)t);
             pixels_in_block = MEM0->current_work.lines_in_block * MEM0->current_work.x_size;
-            overlay(MEM1->pixel_space, MEM2->pixel_space, pixels_in_block, MEM0->pixel_space);
+
+            uint32_t convolution_buffer = MEM0->current_work.bytes_per_pixel == 1 ? MEM0->current_work.x_size : 2 * MEM0->current_work.x_size;
+            uint32_t sobel_buffer = MEM0->current_work.x_size;
+
+            overlay(&MEM1->pixel_space[sobel_buffer], &MEM0->pixel_space[convolution_buffer], pixels_in_block, &MEM0->pixel_space[convolution_buffer]);
             MEM0->current_work.busy = 0;
             break;
 
         default:
+            t = read_global_timer();
             xil_printf("%04u/%010u: Unknown value in busy flag: %d\n", (uint32_t)(t >> 32), (uint32_t)t, MEM0->current_work.busy);
             break;
         }

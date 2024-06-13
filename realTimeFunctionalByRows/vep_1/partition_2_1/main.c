@@ -77,6 +77,7 @@ int main(void)
       line_out.y_size = y_size;
       line_out.length = length;
       line_out.isRGB = line_in.isRGB;
+      // fifo_write_token(&MEM0->admin_out, &line_out);
       fifo_write_token(&MEM2->admin_sobel_out, &line_out);
       continue;
     }
@@ -97,6 +98,7 @@ int main(void)
     line_out.y_size = y_size;
     line_out.length = length;
     line_out.isRGB = line_in.isRGB;
+    // fifo_write_token(&MEM0->admin_out, &line_out);
     fifo_write_token(&MEM2->admin_sobel_out, &line_out);
 
     if (line_in.y_position == line_in.y_size - 1)
@@ -111,6 +113,7 @@ int main(void)
       line_out.y_size = y_size;
       line_out.length = length;
       line_out.isRGB = line_in.isRGB;
+      // fifo_write_token(&MEM0->admin_out, &line_out);
       fifo_write_token(&MEM2->admin_sobel_out, &line_out);
     }
   }

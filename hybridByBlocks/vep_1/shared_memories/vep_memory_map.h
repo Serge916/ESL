@@ -21,11 +21,6 @@
 #define VEP_TILE1_PARTITION2_SHARED_REGION_REMOTE_START  0x90010000
 #define VEP_TILE2_PARTITION1_IDMEM_SIZE                  0x00008000
 #define VEP_TILE2_PARTITION1_IDMEM_START                 0x00000000 /* always 0 */
-#define VEP_TILE2_PARTITION2_IDMEM_SIZE                  0x00000000 /* without shared region */
-#define VEP_TILE2_PARTITION2_IDMEM_START                 0x00000000 /* always 0 */
-#define VEP_TILE2_PARTITION2_SHARED_REGION_SIZE          0x00008000
-#define VEP_TILE2_PARTITION2_SHARED_REGION_LOCAL_START   0x00000000 /* only for partition_2_2 */
-#define VEP_TILE2_PARTITION2_SHARED_REGION_REMOTE_START  0xA0010000
 
 // the following arrays contain the same information as the #defines
 // start/size of memory regions shared by partitions for memories 0..2: mem0 mem1 mem2 

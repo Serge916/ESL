@@ -95,7 +95,8 @@ typedef volatile struct
 #ifdef VEP_TILE2_PARTITION2_SHARED_REGION_REMOTE_START
 typedef volatile struct
 {
-  uint8_t pixel_space[ALLOCATED_BYTES_MEM_PRIV];
+  uint8_t convolution_space[ALLOCATED_BYTES_MEM_PRIV / 2];
+  uint8_t sobel_space[ALLOCATED_BYTES_MEM_PRIV / 2];
 } vep_tile2_partition2_shared_region_t;
 #endif
 #ifdef VEP_TILE2_PARTITION3_SHARED_REGION_REMOTE_START

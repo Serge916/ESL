@@ -138,29 +138,30 @@ double const conv_gaussianblur5[] = {
     1 / 256.0,
 };
 
-void convolution(uint8_t const volatile *const frame_in, uint32_t const volatile xsize_in, uint32_t const volatile ysize_in, uint32_t const volatile lines_per_thread, uint32_t const volatile bytes_per_pixel,
-                 double const *const f, uint32_t const fxsize, uint32_t const fysize, uint8_t volatile *const frame_out, uint32_t const frame_half, uint32_t const initial_y)
+void convolution(uint8_t const volatile *const frame_in, uint32_t const volatile xsize_in, uint32_t const volatile ysize_in, uint32_t const volatile lines_in_frame,
+                 double const *const f, uint32_t const filter_size, uint8_t volatile *const frame_out, uint32_t const frame_half, uint32_t const initial_y)
 {
-  uint32_t y_offset = (frame_half == 0) ? 0 : ysize_in - lines_per_thread;
+  uint32_t y_offset = (frame_half == 0) ? 0 : ysize_in - lines_in_frame;
   y_offset += initial_y;
-  for (uint32_t y = 0; y < lines_per_thread; y++)
+  xil_printf("Convoluting from initial y: %d\n", y_offset);
+  for (uint32_t y = 0; y < lines_in_frame; y++)
   {
     for (uint32_t x = 0; x < xsize_in; x++)
     {
       double r = 0;
-      for (uint32_t ty = 0; ty < fysize; ty++)
+      for (uint32_t ty = 0; ty < filter_size; ty++)
       {
-        for (uint32_t tx = 0; tx < fxsize; tx++)
+        for (uint32_t tx = 0; tx < filter_size; tx++)
         {
-          if (x + tx >= fxsize / 2 && x + tx - fxsize / 2 < xsize_in &&
-              y + y_offset + ty >= fysize / 2 && y + y_offset + ty - fysize / 2 < ysize_in)
+          if (x + tx >= filter_size / 2 && x + tx - filter_size / 2 < xsize_in &&
+              y + y_offset + ty >= filter_size / 2 && y + y_offset + ty - filter_size / 2 < ysize_in)
           {
-            r += f[ty * fxsize + tx] * frame_in[((y + ty - fysize / 2) * xsize_in + x + tx - fxsize / 2)];
+            r += f[ty * filter_size + tx] * frame_in[((y + ty - filter_size / 2) * xsize_in + x + tx - filter_size / 2)];
           }
           else
           {
             // use centre pixel when over the border
-            r += f[ty * fxsize + tx] * frame_in[(y * xsize_in + x)];
+            r += f[ty * filter_size + tx] * frame_in[(y * xsize_in + x)];
           }
         }
       }

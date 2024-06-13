@@ -31,9 +31,6 @@ int main(void)
   }
   fifo_print_status(&MEM1->admin_conv_out);
   // Check if Convolution to Sobel buffer is ready
-  // while (!(fifo_initialized(&MEM2->admin_sobel_in)))
-  // {
-  // }
 
   while (!(fifo_initialized(&MEM2->admin_sobel_in)))
   {
@@ -45,7 +42,7 @@ int main(void)
   uint32_t filter_size;
   line_t line_in;
   line_t line_out;
-  uint8_t bytes_in[5][MAX_LINE_SIZE] = {0};
+  uint8_t bytes_in[5 * MAX_LINE_SIZE] = {0};
 
   while (1)
   {
@@ -61,13 +58,13 @@ int main(void)
     {
       for (uint32_t j = 0; j < MAX_LINE_SIZE; j++)
       {
-        bytes_in[i][j] = bytes_in[i + 1][j];
+        bytes_in[i * MAX_LINE_SIZE + j] = bytes_in[(i + 1) * MAX_LINE_SIZE + j];
       }
     }
     // Insert new line
     for (uint32_t j = 0; j < MAX_LINE_SIZE; j++)
     {
-      bytes_in[filter_size - 1][j] = line_in.pixel_space[j];
+      bytes_in[(filter_size - 1) * MAX_LINE_SIZE + j] = line_in.pixel_space[j];
     }
     // If there are not enough lines yet, continue
     if (line_in.y_position < filter_size / 2)
@@ -83,16 +80,15 @@ int main(void)
 
       t = read_global_timer();
       xil_printf("%04u/%010u: Convoluting: %d\n", (uint32_t)(t >> 32), (uint32_t)t, y_position);
-
-      convolution(&bytes_in[filter_size / 2], length, y_position, y_size, filter, filter_size, filter_size, line_out.pixel_space);
+      convolution(&bytes_in[(filter_size / 2) * MAX_LINE_SIZE], length, y_position, y_size, filter, filter_size, filter_size, line_out.pixel_space);
       // Format line out
       line_out.y_position = y_position;
       line_out.y_size = y_size;
       line_out.length = length;
       line_out.isRGB = line_in.isRGB;
+      fifo_write_token(&MEM0->admin_out, &line_out);
       // fifo_write_token(&MEM2->admin_sobel_in, &line_out);
       // fifo_write_token(&MEM1->admin_conv_out, &line_out);
-      fifo_write_token(&MEM0->admin_out, &line_out);
       continue;
     }
 
@@ -104,17 +100,15 @@ int main(void)
     t = read_global_timer();
     xil_printf("%04u/%010u: Convoluting: %d\n", (uint32_t)(t >> 32), (uint32_t)t, y_position);
 
-    xil_printf("Pixel value in: 0x%x\n", line_in.pixel_space[20]);
     convolution(bytes_in, length, y_position, y_size, filter, filter_size, filter_size, line_out.pixel_space);
     // Format line out
     line_out.y_position = y_position;
     line_out.y_size = y_size;
     line_out.length = length;
     line_out.isRGB = line_in.isRGB;
+    fifo_write_token(&MEM0->admin_out, &line_out);
     // fifo_write_token(&MEM2->admin_sobel_in, &line_out);
     // fifo_write_token(&MEM1->admin_conv_out, &line_out);
-    xil_printf("Pixel value out: 0x%x\n", line_out.pixel_space[20]);
-    fifo_write_token(&MEM0->admin_out, &line_out);
 
     if (line_in.y_position == line_in.y_size - 1)
     {
@@ -123,15 +117,15 @@ int main(void)
         t = read_global_timer();
         xil_printf("%04u/%010u: Convoluting: %d\n", (uint32_t)(t >> 32), (uint32_t)t, y_position + i);
 
-        convolution(&bytes_in[i], length, y_position + i, y_size, filter, filter_size, filter_size, line_out.pixel_space);
+        convolution(&bytes_in[i * MAX_LINE_SIZE], length, y_position + i, y_size, filter, filter_size, filter_size, line_out.pixel_space);
 
         line_out.y_position = y_position + i;
         line_out.y_size = y_size;
         line_out.length = length;
         line_out.isRGB = line_in.isRGB;
+        fifo_write_token(&MEM0->admin_out, &line_out);
         // fifo_write_token(&MEM2->admin_sobel_in, &line_out);
         // fifo_write_token(&MEM1->admin_conv_out, &line_out);
-        fifo_write_token(&MEM0->admin_out, &line_out);
       }
     }
   }

@@ -40,8 +40,8 @@ void sobel(uint8_t const volatile *const lines_in, uint32_t const length, uint32
       {
         for (int32_t tx = 0; tx < fxsize; tx++)
         {
-          xr += sobelx[ty * fxsize + tx] * lines_in[ty * fysize + x + tx - fxsize / 2];
-          yr += sobely[ty * fxsize + tx] * lines_in[ty * fysize + x + tx - fxsize / 2];
+          xr += sobelx[ty * fxsize + tx] * lines_in[ty * length + x + tx - fxsize / 2];
+          yr += sobely[ty * fxsize + tx] * lines_in[ty * length + x + tx - fxsize / 2];
         }
       }
       // gradient magnitude

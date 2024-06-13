@@ -4,23 +4,6 @@
 #include <math.h>
 #include <xil_printf.h>
 
-double const conv_sharpen3[] = {
-    -1,
-    -1,
-    -1,
-    -1,
-    9,
-    -1,
-    -1,
-    -1,
-    -1,
-};
-double const conv_avgxy1[] = {1};
-double const conv_avgx3[] = {
-    0.33,
-    0.33,
-    0.33,
-};
 double const conv_avgxy3[] = {
     0.11,
     0.11,
@@ -32,84 +15,7 @@ double const conv_avgxy3[] = {
     0.11,
     0.11,
 };
-double const conv_avgxy5[] = {
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-};
-double const conv_avgxy7[] = {
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-    0.02,
-};
+
 double const conv_gaussianblur5[] = {
     1 / 256.0,
     4 / 256.0,
@@ -143,9 +49,10 @@ void convolution(uint8_t const volatile *const lines_in, uint32_t const volatile
 {
   uint32_t fx_half_size = fxsize / 2;
   uint32_t fy_half_size = fysize / 2;
+  double r = 0;
   for (uint32_t x = 0; x < length; x++)
   {
-    double r = 0;
+    r = 0;
     for (uint32_t ty = 0; ty < fysize; ty++)
     {
       for (uint32_t tx = 0; tx < fxsize; tx++)
@@ -153,20 +60,37 @@ void convolution(uint8_t const volatile *const lines_in, uint32_t const volatile
         if (x + tx >= fx_half_size && x + tx - fx_half_size < length && y_position + ty >= fy_half_size &&
             y_position + ty - fy_half_size < y_size)
         {
-          r += f[ty * fxsize + tx] * lines_in[ty * fysize + tx + x - fx_half_size];
+          r += f[ty * fxsize + tx] * (double)lines_in[x + tx - fx_half_size + length * ty];
+          if (y_position == 91 && x == 0)
+          {
+            // xil_printf("lines_in[%d] = %u\n", x + tx - fx_half_size + length * ty, lines_in[x + tx - fx_half_size + length * ty]);
+            // xil_printf("f[%d] = %f\n", ty * fxsize + tx, f[ty * fxsize + tx]);
+            xil_printf("r+= f[%d] * lines_in[%d]\n", ty * fxsize + tx, x + tx - fx_half_size + length * ty);
+            // xil_printf("%0.2f += %0.2d * %u\n", r, f[ty * fxsize + tx], lines_in[x + tx - fx_half_size + length * ty]);
+          }
         }
         else
         {
-          r += f[ty * fxsize + tx] * lines_in[fy_half_size * fysize + x];
+          r += f[ty * fxsize + tx] * (double)lines_in[fy_half_size * fysize + x];
         }
-        // clip/saturate to uint8_t
-        if (r < 0)
-          line_out[x] = 0;
-        else if (r > UINT8_MAX)
-          line_out[x] = UINT8_MAX;
-        else
-          line_out[x] = (uint8_t)r;
       }
+    }
+    // clip/saturate to uint8_t
+    if (r < 0)
+    {
+      line_out[x] = 0;
+    }
+    else if (r > UINT8_MAX)
+    {
+      line_out[x] = UINT8_MAX;
+    }
+    else
+    {
+      line_out[x] = (uint8_t)r;
+    }
+    if (y_position == 91 && x == 0)
+    {
+      xil_printf("line_out = %d\n", line_out[x]);
     }
   }
 }

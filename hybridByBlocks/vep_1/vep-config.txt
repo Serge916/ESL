@@ -7,7 +7,7 @@ on tile 0 partition 1 has 16KiB stack in 32KiB memory starting at 32KiB
 on tile 1 partition 1 has 16KiB stack in 32KiB memory starting at 32KiB
 on tile 2 partition 1 has 16KiB stack in 32KiB memory starting at 32KiB
 on tile 1 partition 2 has 0KiB stack in 64KiB memory starting at 64KiB
-on tile 2 partition 2 has 0KiB stack in 64KiB memory starting at 64KiB
+##on tile 2 partition 2 has 0KiB stack in 64KiB memory starting at 64KiB
 ##
 ## shared memory allocation for this vep
 ## - the starting addresses are RELATIVE to the start of the shared memory
@@ -18,7 +18,7 @@ on tile 2 partition 2 has 0KiB stack in 64KiB memory starting at 64KiB
 ## - use shared_memories/vep_shared_memories.h to manage shared memories
 ##
 on tile 1 partition 2 shares 64KiB private memory
-on tile 2 partition 2 shares 64KiB private memory
+##on tile 2 partition 2 shares 64KiB private memory
 in shared memory memshared0 shares 92KiB private memory starting at 36KiB
 ##
 ## schedule for partitions that have a memory allocation

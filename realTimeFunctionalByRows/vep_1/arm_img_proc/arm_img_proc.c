@@ -72,7 +72,6 @@ int main(int argc, char **argv)
       uint32_t available_slots_in = fifo_spaces(admin_in);
       if (available_slots_in > line_dimension && inserted_lines < ysize_snd)
       {
-        // printf("Inserted lines: %d", inserted_lines);
         for (uint32_t i = 0; i < line_dimension; i++)
         {
           uint32_t space_index = fifo_claim_space(admin_in);
@@ -83,7 +82,11 @@ int main(int argc, char **argv)
           line_in->isRGB = bitsperpixel_snd > 8 ? 1 : 0;
           for (uint32_t j = 0; j < xsize_snd; j++)
           {
-            line_in->pixel_space[j] = frame_snd[inserted_lines * bytes_per_line + (j + i) * line_dimension];
+            line_in->pixel_space[j] = frame_snd[inserted_lines * bytes_per_line + i + (j * line_dimension)];
+            if (inserted_lines < 1)
+            {
+              printf("frame_snd[%d]\n", inserted_lines * bytes_per_line + i + j * line_dimension);
+            }
           }
           fifo_release_token(admin_in);
         }
@@ -103,7 +106,6 @@ int main(int argc, char **argv)
         }
         fifo_release_space(admin_out);
         printf("Line out: %d/%d\n", y_position, y_size);
-        printf("Pixel value: 0x%x\n", frame_out[20]);
         processed_lines++;
         // Conditional in this scope to avoid True without having taken any line out
         if (y_position >= ysize_snd - 1)
