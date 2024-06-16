@@ -55,7 +55,7 @@ int main(int argc, char **argv)
         uint32_t convolution_buffer = (bytes_per_pixel == 1) ? xsize_snd * 1 : xsize_snd * 2;
         uint32_t sobel_buffer = xsize_snd;
         uint32_t block_size = (bytes_per_pixel == 1) ? ALLOCATED_BYTES_MEM_PRIV : ALLOCATED_BYTES_MEMS;
-        block_size -= convolution_buffer;
+        block_size -= (2 * convolution_buffer);
 
         uint32_t block_nr = bytes_snd / block_size;
         block_nr += (bytes_snd % block_size > 0) ? 1 : 0;
@@ -79,16 +79,23 @@ int main(int argc, char **argv)
             data_in_shared_mem->current_work.initial_y = initial_y;
             data_in_shared_mem->current_work.lines_in_block = lines_in_block;
             printf("Working on block %d. Initial y is %d and lines are %d\n", block, data_in_shared_mem->current_work.initial_y, data_in_shared_mem->current_work.lines_in_block);
-            for (uint32_t index = 0; index < lines_in_block * xsize_snd * bytes_per_pixel; index++)
+            // Block + upper buffer
+            for (uint32_t index = 0; index < (lines_in_block * xsize_snd + convolution_buffer) * bytes_per_pixel && index + initial_y * xsize_snd * bytes_per_pixel < bytes_snd; index++)
             {
                 data_in_shared_mem->pixel_space[index + convolution_buffer] = frame_snd[index + (initial_y * xsize_snd * bytes_per_pixel)];
             }
+
+            // for (uint32_t index = 0; index < lines_in_block * xsize_snd * bytes_per_pixel; index++)
+            // {
+            //     data_in_shared_mem->pixel_space[index + convolution_buffer] = frame_snd[index + (initial_y * xsize_snd * bytes_per_pixel)];
+            // }
+
             data_in_shared_mem->current_work.busy = 1;
 
             while (data_in_shared_mem->current_work.busy != 0)
             {
             }
-            for (uint32_t index = 0; index < lines_in_block * xsize_snd; index++)
+            for (uint32_t index = 0; index < lines_in_block * xsize_snd + convolution_buffer; index++)
             {
                 frame_buffer[index + initial_y * xsize_snd] = data_in_shared_mem->pixel_space[index + convolution_buffer];
             }

@@ -139,11 +139,13 @@ double const conv_gaussianblur5[] = {
 };
 
 void convolution(uint8_t const volatile *const frame_in, uint32_t const volatile xsize_in, uint32_t const volatile ysize_in, uint32_t const volatile lines_in_frame,
-                 double const *const f, uint32_t const filter_size, uint8_t volatile *const frame_out, uint32_t const frame_half, uint32_t const initial_y)
+                 double const *const f, uint32_t const filter_size, uint8_t volatile *const frame_out, uint32_t const frame_half, uint32_t const initial_y, uint32_t const lines_in_block)
 {
-  uint32_t y_offset = (frame_half == 0) ? 0 : ysize_in - lines_in_frame;
+  uint32_t buffer = (initial_y + lines_in_block == ysize_in - 1) ? 0 : filter_size / 2;
+  uint32_t y_offset = (frame_half == 0) ? 0 : lines_in_block - lines_in_frame - buffer;
+  uint32_t y_frame = y_offset;
   y_offset += initial_y;
-  xil_printf("Convoluting from initial y: %d\n", y_offset);
+  xil_printf("Starting at y_offset: %d, y_frame: %d\n", y_offset, y_frame);
   for (uint32_t y = 0; y < lines_in_frame; y++)
   {
     for (uint32_t x = 0; x < xsize_in; x++)
@@ -156,22 +158,22 @@ void convolution(uint8_t const volatile *const frame_in, uint32_t const volatile
           if (x + tx >= filter_size / 2 && x + tx - filter_size / 2 < xsize_in &&
               y + y_offset + ty >= filter_size / 2 && y + y_offset + ty - filter_size / 2 < ysize_in)
           {
-            r += f[ty * filter_size + tx] * frame_in[((y + ty - filter_size / 2) * xsize_in + x + tx - filter_size / 2)];
+            r += f[ty * filter_size + tx] * frame_in[((y + y_frame + ty - filter_size / 2) * xsize_in + x + tx - filter_size / 2)];
           }
           else
           {
-            // use centre pixel when over the border
-            r += f[ty * filter_size + tx] * frame_in[(y * xsize_in + x)];
+            // use center pixel when over the border
+            r += f[ty * filter_size + tx] * frame_in[((y + y_frame) * xsize_in + x)];
           }
         }
       }
       // clip/saturate to uint8_t
       if (r < 0)
-        frame_out[(y * xsize_in + x)] = 0;
+        frame_out[((y + y_frame) * xsize_in + x)] = 0;
       else if (r > UINT8_MAX)
-        frame_out[(y * xsize_in + x)] = UINT8_MAX;
+        frame_out[((y + y_frame) * xsize_in + x)] = UINT8_MAX;
       else
-        frame_out[(y * xsize_in + x)] = (uint8_t)r;
+        frame_out[((y + y_frame) * xsize_in + x)] = (uint8_t)r;
     }
   }
 }
