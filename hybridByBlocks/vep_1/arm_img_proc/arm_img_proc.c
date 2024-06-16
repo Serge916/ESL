@@ -95,7 +95,7 @@ int main(int argc, char **argv)
             while (data_in_shared_mem->current_work.busy != 0)
             {
             }
-            for (uint32_t index = 0; index < lines_in_block * xsize_snd + convolution_buffer; index++)
+            for (uint32_t index = 0; index < lines_in_block * xsize_snd; index++)
             {
                 frame_buffer[index + initial_y * xsize_snd] = data_in_shared_mem->pixel_space[index + convolution_buffer];
             }

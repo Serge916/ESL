@@ -26,23 +26,18 @@ int main(void)
             t = read_global_timer();
             xil_printf("%04u/%010u: Greyscaling\n", (uint32_t)(t >> 32), (uint32_t)t);
             pixels_in_block = MEM0->current_work.lines_in_block * MEM0->current_work.x_size;
-            convolution_buffer = (MEM0->current_work.bytes_per_pixel == 1) ? MEM0->current_work.x_size : 2 * MEM0->current_work.x_size;
+            convolution_buffer = 2 * MEM0->current_work.x_size;
             if (MEM0->current_work.bytes_per_pixel == 3)
             {
                 // Normal block
-                greyscale(&MEM0->pixel_space[convolution_buffer], MEM0->current_work.bytes_per_pixel, pixels_in_block + convolution_buffer, &MEM0->pixel_space[convolution_buffer]);
+                greyscale(&MEM0->pixel_space[convolution_buffer], MEM0->current_work.bytes_per_pixel, pixels_in_block, &MEM0->pixel_space[convolution_buffer]);
                 // Upper buffer
-                // greyscale(&MEM0->pixel_space[convolution_buffer + pixels_in_block], MEM0->current_work.bytes_per_pixel, convolution_buffer, &MEM0->pixel_space[convolution_buffer + pixels_in_block]);
-            }
-
-            for (uint32_t index = 0; index < convolution_buffer; index++)
-            {
-                MEM0->pixel_space[index] = MEM0->pixel_space[pixels_in_block - convolution_buffer - 1 + index];
+                greyscale(&MEM0->pixel_space[convolution_buffer + pixels_in_block], MEM0->current_work.bytes_per_pixel, convolution_buffer, &MEM0->pixel_space[convolution_buffer + pixels_in_block]);
             }
 
             t = read_global_timer();
             xil_printf("%04u/%010u: Finished greyscaling\n", (uint32_t)(t >> 32), (uint32_t)t);
-            MEM0->current_work.busy = 0;
+            MEM0->current_work.busy = 2;
             break;
         case 2:
             break;

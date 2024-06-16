@@ -35,7 +35,6 @@ int main(void)
   uint32_t x_size;
   uint32_t lines_per_frame;
   uint32_t lines_in_block;
-  uint32_t lines_for_convolution;
   uint32_t initial_y;
   uint32_t bytes_per_pixel;
   uint32_t convolution_buffer;
@@ -80,43 +79,36 @@ int main(void)
       //   frameB[i + x_size] = 0;
       // }
     }
-
-    if (FRAME_HALF == 1)
-    {
-      if (initial_y + lines_in_block < y_size - 1)
-      {
-        lines_for_convolution = (bytes_per_pixel == 1) ? lines_per_frame - 1 : lines_per_frame - 2;
-        xil_printf("Reducing line amount! line no. %d\n", lines_for_convolution);
-      }
-      else
-      {
-        lines_for_convolution = lines_per_frame;
-        xil_printf("Reached final line! line no. %d\n", lines_for_convolution);
-      }
-    }
-
     barrier(++barrier_counter);
     lines_in_block = MEM0->current_work.lines_in_block;
 
     t = read_global_timer();
     xil_printf("%04u/%010u: Convoluting\n", (uint32_t)(t >> 32), (uint32_t)t);
 
-    convolution(&frameA[convolution_buffer], x_size, y_size, lines_for_convolution, filter, filter_size, &frameB[x_size], FRAME_HALF, initial_y, lines_in_block);
-
-    // barrier(++barrier_counter);
-
-    // if (FRAME_HALF == 1)
+    // if (FRAME_HALF == 0)
     // {
-    //   // Convolution
-    //   for (uint32_t index = 0; index < convolution_buffer; index++)
-    //   {
-    //     frameA[index] = frameA[index + convolution_buffer + lines_in_block * x_size];
-    //   }
+    //   convolution(frameA, x_size, y_size, lines_per_frame, filter, filter_size, &frameB[x_size], FRAME_HALF, initial_y, lines_in_block);
+    // }
+    // else
+    // {
+    //   convolution(&frameA[convolution_buffer + (lines_in_block - lines_per_frame) * x_size], x_size, y_size, lines_per_frame, filter, filter_size, &frameB[x_size], FRAME_HALF, initial_y, lines_in_block);
     // }
 
+    convolution(&frameA[convolution_buffer], x_size, y_size, lines_per_frame, filter, filter_size, &frameB[x_size], FRAME_HALF, initial_y, lines_in_block);
+
+    barrier(++barrier_counter);
+
+    if (FRAME_HALF == 1)
+    {
+      // Convolution
+      for (uint32_t index = 0; index < convolution_buffer; index++)
+      {
+        frameA[index] = frameA[index + convolution_buffer + lines_in_block * x_size];
+      }
+    }
     // barrier(++barrier_counter);
     // // sobel
-    // sobel(&frameB[x_size], x_size, y_size, lines_per_frame, bytes_per_pixel, threshold, &frameA[x_size * FRAME_HALF * (y_size - lines_in_thread) + function_buffer], FRAME_HALF, initial_y);
+    // sobel(&frameB[x_size * FRAME_HALF * (y_size - lines_in_thread) + function_buffer], x_size, y_size, lines_in_thread, bytes_per_pixel, threshold, &frameA[x_size * FRAME_HALF * (y_size - lines_in_thread) + function_buffer], FRAME_HALF, initial_y);
     // // Save lines for next block arrival
     // if (initial_y == 0 && FRAME_HALF == 1)
     // {
@@ -132,12 +124,12 @@ int main(void)
     if (FRAME_HALF == 1)
     {
       // Convolution
-      // for (uint32_t index = 0; index < convolution_buffer; index++)
-      // {
-      //   frameA[index] = frameA[index + convolution_buffer + lines_in_block * x_size];
-      //   // frameA[convolution_buffer - (index + 1)] = frameA[x_size * lines_in_block - (index + 1) + convolution_buffer];
-      //   // xil_printf("moving pixel from %p to %p\n", &frameA[convolution_buffer - (index + 1)], &frameA[x_size * lines_in_block - (index + 1) + convolution_buffer]);
-      // }
+      for (uint32_t index = 0; index < convolution_buffer; index++)
+      {
+        frameA[index] = frameA[index + convolution_buffer + lines_in_block * x_size];
+        // frameA[convolution_buffer - (index + 1)] = frameA[x_size * lines_in_block - (index + 1) + convolution_buffer];
+        // xil_printf("moving pixel from %p to %p\n", &frameA[convolution_buffer - (index + 1)], &frameA[x_size * lines_in_block - (index + 1) + convolution_buffer]);
+      }
       // Sobel
       // for (uint32_t index = 0; index < x_size; index++)
       // {

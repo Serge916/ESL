@@ -141,11 +141,9 @@ double const conv_gaussianblur5[] = {
 void convolution(uint8_t const volatile *const frame_in, uint32_t const volatile xsize_in, uint32_t const volatile ysize_in, uint32_t const volatile lines_in_frame,
                  double const *const f, uint32_t const filter_size, uint8_t volatile *const frame_out, uint32_t const frame_half, uint32_t const initial_y, uint32_t const lines_in_block)
 {
-  uint32_t buffer = (initial_y + lines_in_block == ysize_in - 1) ? 0 : filter_size / 2;
-  uint32_t y_offset = (frame_half == 0) ? 0 : lines_in_block - lines_in_frame - buffer;
+  uint32_t y_offset = (frame_half == 0) ? 0 : lines_in_block - lines_in_frame;
   uint32_t y_frame = y_offset;
   y_offset += initial_y;
-  xil_printf("Starting at y_offset: %d, y_frame: %d\n", y_offset, y_frame);
   for (uint32_t y = 0; y < lines_in_frame; y++)
   {
     for (uint32_t x = 0; x < xsize_in; x++)
