@@ -73,11 +73,6 @@ int main(void)
       threshold = (bytes_per_pixel == 1 ? 100 : 128);
 
       barrier_counter = 0;
-
-      // for (uint32_t i = 0; i < y_size * x_size; i++)
-      // {
-      //   frameB[i + x_size] = 0;
-      // }
     }
     barrier(++barrier_counter);
     lines_in_block = MEM0->current_work.lines_in_block;
@@ -85,56 +80,30 @@ int main(void)
     t = read_global_timer();
     xil_printf("%04u/%010u: Convoluting\n", (uint32_t)(t >> 32), (uint32_t)t);
 
-    // if (FRAME_HALF == 0)
-    // {
-    //   convolution(frameA, x_size, y_size, lines_per_frame, filter, filter_size, &frameB[x_size], FRAME_HALF, initial_y, lines_in_block);
-    // }
-    // else
-    // {
-    //   convolution(&frameA[convolution_buffer + (lines_in_block - lines_per_frame) * x_size], x_size, y_size, lines_per_frame, filter, filter_size, &frameB[x_size], FRAME_HALF, initial_y, lines_in_block);
-    // }
-
     convolution(&frameA[convolution_buffer], x_size, y_size, lines_per_frame, filter, filter_size, &frameB[x_size], FRAME_HALF, initial_y, lines_in_block);
 
-    barrier(++barrier_counter);
-
-    if (FRAME_HALF == 1)
-    {
-      // Convolution
-      for (uint32_t index = 0; index < convolution_buffer; index++)
-      {
-        frameA[index] = frameA[index + convolution_buffer + lines_in_block * x_size];
-      }
-    }
     // barrier(++barrier_counter);
-    // // sobel
-    // sobel(&frameB[x_size * FRAME_HALF * (y_size - lines_in_thread) + function_buffer], x_size, y_size, lines_in_thread, bytes_per_pixel, threshold, &frameA[x_size * FRAME_HALF * (y_size - lines_in_thread) + function_buffer], FRAME_HALF, initial_y);
-    // // Save lines for next block arrival
-    // if (initial_y == 0 && FRAME_HALF == 1)
+
+    // if (FRAME_HALF == 1)
     // {
-    //   for (uint32_t index = x_size * (y_size - filter_size / 2); index < x_size * y_size - 1; index++)
+    //   // Convolution
+    //   for (uint32_t index = 0; index < convolution_buffer; index++)
     //   {
-    //     frameB[index - x_size * (y_size - filter_size / 2)] = frameB[index];
+    //     frameA[index] = frameA[index + convolution_buffer + lines_in_block * x_size];
     //   }
     // }
+    barrier(++barrier_counter);
+    // sobel
+    t = read_global_timer();
+    xil_printf("%04u/%010u: Sobel\n", (uint32_t)(t >> 32), (uint32_t)t);
+
+    sobel(&frameB[x_size], x_size, y_size, lines_per_frame, threshold, &frameA[convolution_buffer], FRAME_HALF, initial_y, lines_in_block);
 
     barrier(++barrier_counter);
 
     // Store previous lines for convolution and sobel
     if (FRAME_HALF == 1)
     {
-      // Convolution
-      for (uint32_t index = 0; index < convolution_buffer; index++)
-      {
-        frameA[index] = frameA[index + convolution_buffer + lines_in_block * x_size];
-        // frameA[convolution_buffer - (index + 1)] = frameA[x_size * lines_in_block - (index + 1) + convolution_buffer];
-        // xil_printf("moving pixel from %p to %p\n", &frameA[convolution_buffer - (index + 1)], &frameA[x_size * lines_in_block - (index + 1) + convolution_buffer]);
-      }
-      // Sobel
-      // for (uint32_t index = 0; index < x_size; index++)
-      // {
-      //   frameB[x_size - (index + 1)] = frameB[x_size * lines_per_frame - (index + 1)];
-      // }
       // Notify the next partition
       MEM0->current_work.busy = 3;
     }

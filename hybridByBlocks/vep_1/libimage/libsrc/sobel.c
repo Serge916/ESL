@@ -35,7 +35,7 @@ void sobel(uint8_t const volatile *const frame_in, uint32_t const xsize_in, uint
     {
       if (x < (fxsize + 1) / 2 || x >= xsize_in - (fxsize + 1) / 2 || (y + y_offset) < (fysize + 1) / 2 || (y + y_offset) >= ysize_in - (fysize + 1) / 2)
       {
-        frame_out[y * xsize_in + x] = 0;
+        frame_out[(y + y_frame) * xsize_in + x] = 0;
       }
       else
       {
@@ -52,9 +52,9 @@ void sobel(uint8_t const volatile *const frame_in, uint32_t const xsize_in, uint
         double const r = yr * yr + xr * xr;
         // clip/saturate from int32_t to uint8_t
         if (r < threshold * threshold)
-          frame_out[y * xsize_in + x] = 0;
+          frame_out[(y + y_frame) * xsize_in + x] = 0;
         else
-          frame_out[y * xsize_in + x] = UINT8_MAX;
+          frame_out[(y + y_frame) * xsize_in + x] = UINT8_MAX;
       }
     }
   }

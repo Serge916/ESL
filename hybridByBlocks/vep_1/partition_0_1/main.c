@@ -32,7 +32,7 @@ int main(void)
                 // Normal block
                 greyscale(&MEM0->pixel_space[convolution_buffer], MEM0->current_work.bytes_per_pixel, pixels_in_block, &MEM0->pixel_space[convolution_buffer]);
                 // Upper buffer
-                greyscale(&MEM0->pixel_space[convolution_buffer + pixels_in_block], MEM0->current_work.bytes_per_pixel, convolution_buffer, &MEM0->pixel_space[convolution_buffer + pixels_in_block]);
+                // greyscale(&MEM0->pixel_space[convolution_buffer + pixels_in_block], MEM0->current_work.bytes_per_pixel, convolution_buffer, &MEM0->pixel_space[convolution_buffer + pixels_in_block]);
             }
 
             t = read_global_timer();
