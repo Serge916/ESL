@@ -7,6 +7,6 @@ void overlay(uint8_t const volatile *const line_in_1, uint8_t const volatile *co
   double const ratio_complementary = 1 - ratio;
   for (uint32_t i = 0; i < length; i++)
   {
-    line_out[i] = ratio * line_in_1[i] + ratio_complementary * line_in_2[i];
+    line_out[i] = (uint8_t)(ratio * (double)line_in_1[i] + ratio_complementary * (double)line_in_2[i]);
   }
 }

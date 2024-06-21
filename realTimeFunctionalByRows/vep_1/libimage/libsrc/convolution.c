@@ -61,13 +61,6 @@ void convolution(uint8_t const volatile *const lines_in, uint32_t const volatile
             y_position + ty - fy_half_size < y_size)
         {
           r += f[ty * fxsize + tx] * (double)lines_in[x + tx - fx_half_size + length * ty];
-          if (y_position == 91 && x == 0)
-          {
-            // xil_printf("lines_in[%d] = %u\n", x + tx - fx_half_size + length * ty, lines_in[x + tx - fx_half_size + length * ty]);
-            // xil_printf("f[%d] = %f\n", ty * fxsize + tx, f[ty * fxsize + tx]);
-            xil_printf("r+= f[%d] * lines_in[%d]\n", ty * fxsize + tx, x + tx - fx_half_size + length * ty);
-            // xil_printf("%0.2f += %0.2d * %u\n", r, f[ty * fxsize + tx], lines_in[x + tx - fx_half_size + length * ty]);
-          }
         }
         else
         {
@@ -87,10 +80,6 @@ void convolution(uint8_t const volatile *const lines_in, uint32_t const volatile
     else
     {
       line_out[x] = (uint8_t)r;
-    }
-    if (y_position == 91 && x == 0)
-    {
-      xil_printf("line_out = %d\n", line_out[x]);
     }
   }
 }

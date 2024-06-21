@@ -25,6 +25,8 @@
 #define SOBEL_BUFFER_IN_SIZE 10
 #define SOBEL_BUFFER_OUT_SIZE 10
 
+// #define TIME_MEASURE
+
 typedef struct
 {
   uint8_t pixel_space[MAX_LINE_SIZE];
@@ -42,6 +44,10 @@ typedef volatile struct
   fifo_t admin_out;
   line_t lines_in[LINE_IN_BUFFER_SIZE];
   line_t lines_out[LINE_OUT_BUFFER_SIZE];
+#ifdef TIME_MEASURE
+  // Usually uint32_t should be enough, but 8B to avoid problems
+  uint64_t wcet[6];
+#endif
 
 } vep_memshared0_shared_region_t;
 #endif

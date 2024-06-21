@@ -13,7 +13,7 @@
 // GREYSCALE NODE
 int main(void)
 {
-  uint64_t t;
+  uint64_t t, t_start;
 
   xil_printf("starting the ARM to Greyscale buffer\n");
   if (fifo_init(&MEM0->admin_in, MEM0->lines_in, LINE_IN_BUFFER_SIZE, sizeof(line_t)) == NULL)
@@ -33,6 +33,9 @@ int main(void)
 
   while (1)
   {
+#ifdef TIME_MEASURE
+    t_start = read_partition_timer();
+#endif
     if (fifo_tokens(&MEM0->admin_in))
     {
       // Store first line
@@ -70,6 +73,13 @@ int main(void)
         // fifo_write_token(&MEM0->admin_out, &lines_in[0]);
         fifo_write_token(&MEM1->admin_conv_in, &lines_in[0]);
       }
+#ifdef TIME_MEASURE
+      t = read_partition_timer();
+      if (MEM0->wcet[1] < t - t_start)
+      {
+        MEM0->wcet[1] = t - t_start;
+      }
+#endif
     }
   }
 

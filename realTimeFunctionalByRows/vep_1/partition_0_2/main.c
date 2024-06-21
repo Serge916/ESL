@@ -10,7 +10,7 @@
 #define MEM0 vep_memshared0_shared_region
 #define MEM1 vep_tile1_partition1_shared_region
 #define MEM2 vep_tile2_partition1_shared_region
-#define RATIO 0.7
+#define RATIO (double)0.7
 
 // OVERLAY NODE
 int main(void)
@@ -27,7 +27,7 @@ int main(void)
   line_t line_in_conv;
   line_t line_in_sobel;
   line_t line_out;
-  uint64_t t;
+  uint64_t t, t_start;
 
   while (!(fifo_initialized(&MEM2->admin_sobel_out) && fifo_initialized(&MEM1->admin_conv_out)))
   {
@@ -35,6 +35,9 @@ int main(void)
 
   while (1)
   {
+#ifdef TIME_MEASURE
+    t_start = read_partition_timer();
+#endif
     if (!(fifo_tokens(&MEM2->admin_sobel_out) && fifo_tokens(&MEM1->admin_conv_out)))
     {
       continue;
@@ -60,6 +63,15 @@ int main(void)
     line_out.isRGB = line_in_conv.isRGB;
 
     fifo_write_token(&MEM0->admin_out, &line_out);
+#ifdef TIME_MEASURE
+    // Here to avoid non steady state measurements
+    t = read_partition_timer();
+    if (MEM0->wcet[4] < t - t_start)
+    {
+      uint64_t diff = t - t_start;
+      MEM0->wcet[4] = t - t_start;
+    }
+#endif
   }
 
   return 0;

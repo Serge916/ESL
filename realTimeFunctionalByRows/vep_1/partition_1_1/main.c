@@ -36,7 +36,7 @@ int main(void)
   {
   }
 
-  uint64_t t;
+  uint64_t t, t_start;
 
   double const *filter;
   uint32_t filter_size;
@@ -46,6 +46,9 @@ int main(void)
 
   while (1)
   {
+#ifdef TIME_MEASURE
+    t_start = read_partition_timer();
+#endif
     if (!fifo_tokens(&MEM1->admin_conv_in))
     {
       continue;
@@ -86,9 +89,9 @@ int main(void)
       line_out.y_size = y_size;
       line_out.length = length;
       line_out.isRGB = line_in.isRGB;
-      fifo_write_token(&MEM0->admin_out, &line_out);
-      // fifo_write_token(&MEM2->admin_sobel_in, &line_out);
-      // fifo_write_token(&MEM1->admin_conv_out, &line_out);
+      // fifo_write_token(&MEM0->admin_out, &line_out);
+      fifo_write_token(&MEM2->admin_sobel_in, &line_out);
+      fifo_write_token(&MEM1->admin_conv_out, &line_out);
       continue;
     }
 
@@ -106,9 +109,18 @@ int main(void)
     line_out.y_size = y_size;
     line_out.length = length;
     line_out.isRGB = line_in.isRGB;
-    fifo_write_token(&MEM0->admin_out, &line_out);
-    // fifo_write_token(&MEM2->admin_sobel_in, &line_out);
-    // fifo_write_token(&MEM1->admin_conv_out, &line_out);
+    // fifo_write_token(&MEM0->admin_out, &line_out);
+    fifo_write_token(&MEM2->admin_sobel_in, &line_out);
+    fifo_write_token(&MEM1->admin_conv_out, &line_out);
+
+#ifdef TIME_MEASURE
+    // Here to avoid non steady state measurements
+    t = read_partition_timer();
+    if (MEM0->wcet[2] < t - t_start)
+    {
+      MEM0->wcet[2] = t - t_start;
+    }
+#endif
 
     if (line_in.y_position == line_in.y_size - 1)
     {
@@ -123,9 +135,9 @@ int main(void)
         line_out.y_size = y_size;
         line_out.length = length;
         line_out.isRGB = line_in.isRGB;
-        fifo_write_token(&MEM0->admin_out, &line_out);
-        // fifo_write_token(&MEM2->admin_sobel_in, &line_out);
-        // fifo_write_token(&MEM1->admin_conv_out, &line_out);
+        // fifo_write_token(&MEM0->admin_out, &line_out);
+        fifo_write_token(&MEM2->admin_sobel_in, &line_out);
+        fifo_write_token(&MEM1->admin_conv_out, &line_out);
       }
     }
   }

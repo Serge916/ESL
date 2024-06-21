@@ -29,12 +29,15 @@ int main(void)
   }
   fifo_print_status(&MEM2->admin_sobel_out);
 
-  uint64_t t;
+  uint64_t t, t_start;
   line_t line_in;
   line_t line_out;
   uint8_t bytes_in[3][MAX_LINE_SIZE] = {0};
   while (1)
   {
+#ifdef TIME_MEASURE
+    t_start = read_partition_timer();
+#endif
     if (!fifo_tokens(&MEM2->admin_sobel_in))
     {
       continue;
@@ -100,6 +103,15 @@ int main(void)
     line_out.isRGB = line_in.isRGB;
     // fifo_write_token(&MEM0->admin_out, &line_out);
     fifo_write_token(&MEM2->admin_sobel_out, &line_out);
+
+#ifdef TIME_MEASURE
+    // Here to avoid non steady state measurements
+    t = read_partition_timer();
+    if (MEM0->wcet[3] < t - t_start)
+    {
+      MEM0->wcet[3] = t - t_start;
+    }
+#endif
 
     if (line_in.y_position == line_in.y_size - 1)
     {

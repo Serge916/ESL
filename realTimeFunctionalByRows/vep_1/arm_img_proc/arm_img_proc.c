@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <arm_shared_memory.h>
 #include <unistd.h>
+#ifdef TIME_MEASURE
+#include <time.h>
+#endif
 /* warning: this is the RISC-V memory map!
  * use only in conjuction with arm_shared_memory_write/read
  */
@@ -16,6 +19,7 @@ extern uint32_t readBMP(char const *const file, uint8_t **outframe, uint32_t *co
 extern uint32_t writeBMP(char const *const file, uint8_t const *const outframe, uint32_t const x_size, uint32_t const y_size, uint32_t const bitsperpixel);
 
 vep_memshared0_shared_region_t volatile *data_in_shared_mem = NULL;
+uint64_t t, t_start;
 
 int main(int argc, char **argv)
 {
@@ -24,7 +28,7 @@ int main(int argc, char **argv)
     fprintf(stderr, "Usage: %s infile ...\n", argv[0]);
     return 1;
   }
-  uint32_t nr_files = argc;
+  uint32_t nr_files = argc - 1;
   data_in_shared_mem = arm_shared_memory_init();
   fifo_t volatile *const admin_in = &data_in_shared_mem->admin_in;
   fifo_t volatile *const admin_out = &data_in_shared_mem->admin_out;
@@ -61,6 +65,11 @@ int main(int argc, char **argv)
       printf("Image (%s) doesn't fit in allocated memory\n", argv[f]);
       continue;
     }
+    if (ysize_snd < 3)
+    {
+      printf("Image (%s) is too small\n", argv[f]);
+      continue;
+    }
     // Allocate space for frame out. In stack to avoid malloc.
     uint8_t frame_out[MAX_IMG_SIZE] = {0};
     printf("Processing file %s\n", argv[f]);
@@ -69,6 +78,9 @@ int main(int argc, char **argv)
 
     while (image_finished == 0)
     {
+#ifdef TIME_MEASURE
+      t_start = clock();
+#endif
       uint32_t available_slots_in = fifo_spaces(admin_in);
       if (available_slots_in > line_dimension && inserted_lines < ysize_snd)
       {
@@ -83,14 +95,18 @@ int main(int argc, char **argv)
           for (uint32_t j = 0; j < xsize_snd; j++)
           {
             line_in->pixel_space[j] = frame_snd[inserted_lines * bytes_per_line + i + (j * line_dimension)];
-            if (inserted_lines < 1)
-            {
-              printf("frame_snd[%d]\n", inserted_lines * bytes_per_line + i + j * line_dimension);
-            }
           }
           fifo_release_token(admin_in);
         }
         inserted_lines++;
+#ifdef TIME_MEASURE
+        t = clock();
+        if (data_in_shared_mem->wcet[0] < t - t_start)
+        {
+          data_in_shared_mem->wcet[0] = t - t_start;
+        }
+        t_start = clock();
+#endif
       }
 
       if (fifo_tokens(admin_out))
@@ -112,6 +128,13 @@ int main(int argc, char **argv)
         {
           image_finished = 1;
         }
+#ifdef TIME_MEASURE
+        t = clock();
+        if (data_in_shared_mem->wcet[5] < t - t_start)
+        {
+          data_in_shared_mem->wcet[5] = t - t_start;
+        }
+#endif
       }
 
       usleep(20);
@@ -130,6 +153,7 @@ int main(int argc, char **argv)
       return 1;
     }
   }
+  printf("WCET (cycles) \n input: %llu\n greyscale: %llu\n convolution: %llu\n sobel: %llu\n overlay: %llu\n output: %llu\n", data_in_shared_mem->wcet[0], data_in_shared_mem->wcet[1], data_in_shared_mem->wcet[2], data_in_shared_mem->wcet[3], data_in_shared_mem->wcet[4], data_in_shared_mem->wcet[5]);
   arm_shared_memory_close();
   return 0;
 }
